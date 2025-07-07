@@ -1,0 +1,41 @@
+services:
+  # RabbitMQ Broker
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  # CockroachDB - Nodo 1 (Región US)
+  roach-us:
+    image: cockroachdb/cockroach:v23.2.2
+    container_name: roach-us
+    hostname: roach-us
+    ports:
+      - "26257:26257" # SQL port
+      - "8080:8080"   # DB Console
+    command: start --insecure --join=roach-us,roach-eu --locality=region=us-east-1
+    volumes:
+      - roach_us_data:/cockroach/cockroach-data
+
+  # CockroachDB - Nodo 2 (Región EU)
+  roach-eu:
+    image: cockroachdb/cockroach:v23.2.2
+    container_name: roach-eu
+    hostname: roach-eu
+    ports:
+      - "26258:26257"
+    command: start --insecure --join=roach-us,roach-eu --locality=region=eu-west-1
+    volumes:
+      - roach_eu_data:/cockroach/cockroach-data
+
+volumes:
+  rabbitmq_data:
+  roach_us_data:
+  roach_eu_data:

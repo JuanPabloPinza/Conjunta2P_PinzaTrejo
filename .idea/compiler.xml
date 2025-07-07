@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="ms-api-gateway" />
+        <module name="ms-eureka-server" />
+      </profile>
+      <profile name="Annotation profile for medical-monitoring-system" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="care-notifier" />
+        <module name="patient-data-collector" />
+        <module name="health-analyzer" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="config-server" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="care-notifier" options="-parameters" />
+      <module name="config-server" options="-parameters" />
+      <module name="health-analyzer" options="-parameters" />
+      <module name="ms-api-gateway" options="-parameters" />
+      <module name="ms-eureka-server" options="-parameters" />
+      <module name="patient-data-collector" options="-parameters" />
+    </option>
+  </component>
+</project>

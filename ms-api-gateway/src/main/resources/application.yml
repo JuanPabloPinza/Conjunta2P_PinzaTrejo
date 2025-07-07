@@ -1,0 +1,71 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: api-gateway # Nombre para Eureka
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true    # deja los service-id en minúsculas
+
+      actuator:                         # <-- debía ir al mismo nivel que discovery
+        verbose:
+          enabled: true                 # imprime predicados y filtros
+
+      routes:
+#        - id: servicio-publicaciones
+#          uri: lb://SERVICIO-PUBLICACIONES
+#          predicates:
+#            - Path=/publicaciones/**
+#          filters:
+#            - StripPrefix=1
+        # --- AÑADIMOS LAS NUEVAS RUTAS DEL PROYECTO MÉDICO ---
+        - id: patient-data-collector-route
+          uri: lb://patient-data-collector # Eureka encontrará el servicio por este nombre
+          predicates:
+            - Path=/conjunta/2p/collector/** # Peticiones a esta ruta
+          filters:
+            - StripPrefix=3 # Quita /conjunta/2p/collector
+
+        - id: care-notifier-route
+          uri: lb://care-notifier
+          predicates:
+            - Path=/conjunta/2p/notifier/**
+          filters:
+            - StripPrefix=3 # Quita /conjunta/2p/notifier
+
+        # Nota: HealthAnalyzer puede no necesitar una ruta si solo escucha eventos.
+        # Pero si expones algún endpoint (ej: para forzar reportes), así lo harías:
+        - id: health-analyzer-route
+          uri: lb://health-analyzer
+          predicates:
+            - Path=/conjunta/2p/analyzer/**
+          filters:
+            - StripPrefix=3 # Quita /conjunta/2p/analyzer
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoint:
+    gateway:
+      enabled: true
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: gateway
