@@ -3,16 +3,27 @@ server:
 
 spring:
     application:
-        name: patient-data-collector # Nombre para Eureka
+        name: PATIENT-DATA-COLLECTOR
     datasource:
-        url: jdbc:postgresql://localhost:26257/medical_db?sslmode=disable
+        url: jdbc:postgresql://localhost:26257/db_patient_data?user=root&password=
         username: root
         password:
+        driver-class-name: org.postgresql.Driver
+
+    resilience-datasource:
+        url: jdbc:postgresql://localhost:5432/resilience_db_collector # Base de datos local. Asegúrate de que exista.
+        username: postgres # ¡CAMBIAR! Tu usuario de PostgreSQL local.
+        password: alex # ¡CAMBIAR! Tu contraseña de PostgreSQL local.
+        driver-class-name: org.postgresql.Driver
+
     jpa:
         hibernate:
             ddl-auto: update
         properties:
             hibernate:
+                show_sql: true
+                format_sql: true
+                use_sql_comments: true
                 dialect: org.hibernate.dialect.PostgreSQLDialect
     rabbitmq:
         host: localhost
@@ -23,6 +34,15 @@ spring:
 eureka:
     client:
         service-url:
-            defaultZone: http://localhost:8761/eureka
+            default-zone: http://localhost:8761/eureka
+        fetch-registry: true
+        register-with-eureka: true
     instance:
-        instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+        prefer-ip-address: true
+        instance-id: ${spring.application.name}:${random.value}
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health,info,gateway

@@ -3,6 +3,12 @@ package ec.edu.espe.conjunta.config;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory; // ¡IMPORTAR!
+import org.springframework.amqp.rabbit.core.RabbitTemplate; // ¡IMPORTAR!
+import org.springframework.amqp.core.AmqpTemplate; // ¡IMPORTAR!
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
+
 
 @Configuration
 public class RabbitMQConfig {
@@ -17,4 +23,11 @@ public class RabbitMQConfig {
     public TopicExchange globalExchange() {
         return new TopicExchange(GLOBAL_EXCHANGE_NAME);
     }
+
+    @Bean
+    public MessageConverter jsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
+
+
 }

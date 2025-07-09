@@ -11,31 +11,67 @@ services:
       - RABBITMQ_DEFAULT_PASS=admin
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - medical-net
 
-  # CockroachDB - Nodo 1 (Región US)
-  roach-us:
-    image: cockroachdb/cockroach:v23.2.2
-    container_name: roach-us
-    hostname: roach-us
+  # 2. CockroachDB - Nodo 1 (Iniciador del clúster - Región US)
+  # Usamos start-single-node para un inicio fiable
+  crdb-node1:
+    image: cockroachdb/cockroach:latest # O una versión específica como v23.2.5
+    container_name: crdb-node1
+    hostname: crdb-node1
     ports:
-      - "26257:26257" # SQL port
-      - "8080:8080"   # DB Console
-    command: start --insecure --join=roach-us,roach-eu --locality=region=us-east-1
+      - "26257:26257" # Puerto SQL principal
+      - "8080:8080"   # DB Console (UI)
+    command: start-single-node --insecure --advertise-addr=crdb-node1 --locality=region=us-east
     volumes:
       - roach_us_data:/cockroach/cockroach-data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - medical-net
 
-  # CockroachDB - Nodo 2 (Región EU)
-  roach-eu:
-    image: cockroachdb/cockroach:v23.2.2
-    container_name: roach-eu
-    hostname: roach-eu
+  # 3. CockroachDB - Nodo 2 (Se une al clúster - Región EU)
+  crdb-node2:
+    image: cockroachdb/cockroach:latest
+    container_name: crdb-node2
+    hostname: crdb-node2
     ports:
       - "26258:26257"
-    command: start --insecure --join=roach-us,roach-eu --locality=region=eu-west-1
+    command: start --insecure --join=crdb-node1:26257 --locality=region=eu-west
     volumes:
       - roach_eu_data:/cockroach/cockroach-data
+    depends_on:
+      crdb-node1:
+        condition: service_healthy # Espera a que el nodo 1 esté listo
+    networks:
+      - medical-net
+
+  # 4. CockroachDB - Nodo 3 (Se une al clúster - Región Asia)
+  crdb-node3:
+    image: cockroachdb/cockroach:latest
+    container_name: crdb-node3
+    hostname: crdb-node3
+    ports:
+      - "26259:26257"
+    command: start --insecure --join=crdb-node1:26257 --locality=region=ap-south
+    volumes:
+      - roach_as_data:/cockroach/cockroach-data
+    depends_on:
+      crdb-node1:
+        condition: service_healthy
+    networks:
+      - medical-net
 
 volumes:
   rabbitmq_data:
   roach_us_data:
   roach_eu_data:
+  roach_as_data:
+
+networks:
+  medical-net:
+    driver: bridge

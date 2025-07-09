@@ -3,26 +3,59 @@ server:
 
 spring:
   application:
-    name: care-notifier # Nombre para Eureka
+    name: CARE-NOTIFIER # Nombre para Eureka
+
+  # --- Datasource Principal (CockroachDB para guardar notificaciones) ---
   datasource:
-    url: jdbc:postgresql://localhost:26257/medical_db?sslmode=disable
+    url: jdbc:postgresql://localhost:26257/db_notifications?sslmode=disable
     username: root
-    password: # tu_password
+    password:
+    driver-class-name: org.postgresql.Driver
+
+    # --- Datasource Secundario para Resiliencia (PostgreSQL Local) ---
+  resilience-datasource:
+    url: jdbc:postgresql://localhost:5432/resilience_db_notifier # ¡NUEVA BASE DE DATOS!
+    username: postgres
+    password: alex # ¡Importante: tu contraseña local de postgres!
+    driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.CockroachDBDialect
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   rabbitmq:
     host: localhost
     port: 5672
-    username: guest
-    password: guest
+    username: admin
+    password: admin
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      default-zone: http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
   instance:
-    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+
+
+
+# Configuración para agrupar alertas de baja prioridad
+notification:
+  grouping-interval-minutes: 1 # Cada 30 minutos
+
+tasks:
+  low-priority-grouping:
+    fixed-rate-ms: 6000 # 30 minutos en milisegundos (para @Scheduled)

@@ -7,17 +7,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="ms-api-gateway" />
-        <module name="ms-eureka-server" />
-      </profile>
-      <profile name="Annotation profile for medical-monitoring-system" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
-        </processorPath>
         <module name="care-notifier" />
+        <module name="ms-eureka-server" />
+        <module name="ms-api-gateway" />
         <module name="patient-data-collector" />
         <module name="health-analyzer" />
       </profile>

@@ -3,26 +3,56 @@ server:
 
 spring:
   application:
-    name: health-analyzer # Nombre para Eureka
+    name: HEALTH-ANALYZER
+
+  # --- Datasource Principal (CockroachDB para guardar alertas) ---
   datasource:
-    url: jdbc:postgresql://localhost:26257/medical_db?sslmode=disable
+    url: jdbc:postgresql://localhost:26257/db_health_alerts?sslmode=disable
     username: root
-    password: # tu_password
+    password:
+    driver-class-name: org.postgresql.Driver
+
+  # --- Datasource Secundario para Resiliencia (PostgreSQL Local) ---
+  resilience-datasource:
+    url: jdbc:postgresql://localhost:5432/resilience_db_analyzer # ¡NUEVA BASE DE DATOS!
+    username: postgres
+    password: alex
+    driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.CockroachDBDialect
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
   rabbitmq:
     host: localhost
     port: 5672
-    username: guest
-    password: guest
+    username: admin
+    password: admin
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      default-zone: http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
   instance:
-    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+
+#tasks:
+#  inactive-check:
+#    rate: 21600000 # 6 horas en ms
+#  daily-report:
+#    cron: "0 0 4 * * *" # 4 AM todos los días
