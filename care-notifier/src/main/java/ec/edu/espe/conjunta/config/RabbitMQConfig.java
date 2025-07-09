@@ -1,5 +1,6 @@
 package ec.edu.espe.conjunta.config;
 
+import ec.edu.espe.conjunta.dto.NewVitalSignEvent;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.support.converter.DefaultClassMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -64,7 +65,7 @@ public class RabbitMQConfig {
         classMapper.setTrustedPackages("ec.edu.espe.conjunta.dto");
         Map<String, Class<?>> idClassMapping = new HashMap<>();
         // Le damos un "alias" corto a cada DTO que viaja por RabbitMQ
-        //idClassMapping.put("newVitalSign", NewVitalSignEvent.class); // Para HealthAnalyzer
+        idClassMapping.put("newVitalSign", NewVitalSignEvent.class); // Para HealthAnalyzer
         idClassMapping.put("alert", AlertEventDto.class);
         idClassMapping.put("dailyReport", DailyReportDto.class);
         classMapper.setIdClassMapping(idClassMapping);
