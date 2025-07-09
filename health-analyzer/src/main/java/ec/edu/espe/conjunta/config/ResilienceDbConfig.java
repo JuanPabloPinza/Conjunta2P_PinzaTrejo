@@ -47,7 +47,7 @@ public class ResilienceDbConfig {
                 .dataSource(dataSource)
                 .packages("ec.edu.espe.conjunta.entity.resilience")
                 .persistenceUnit("resiliencePU")
-                // ¡¡CAMBIO CLAVE: APLICAMOS LAS PROPIEDADES JPA (ddl-auto, dialect, etc.)!!
+                // CAMBIO CLAVE: APLICAMOS LAS PROPIEDADES JPA (ddl-auto, dialect, etc.)!!
                 .properties(jpaProperties.getProperties())
                 .build();
     }

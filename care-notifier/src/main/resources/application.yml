@@ -51,11 +51,28 @@ management:
         include: health,info,gateway
 
 
+# --- CONFIGURACIÓN DE TAREAS PROGRAMADAS ---
+
+# Configuración normal para producción (comentada)
+# tasks:
+#   batch-sending:
+#     rate: 1800000 # 30 minutos en milisegundos
+#   resilience-retry:
+#     rate: 60000   # 1 minuto en milisegundos
+
+# Configuración para pruebas (activa)
+tasks:
+  batch-sending:
+    rate: 60000           # CADA MINUTO (60,000 ms)
+  resilience-retry:
+    rate: 30000           # CADA 30 SEGUNDOS
+
+
 
 # Configuración para agrupar alertas de baja prioridad
-notification:
-  grouping-interval-minutes: 1 # Cada 30 minutos
+#notification:
+ # grouping-interval-minutes: 1 # Cada 30 minutos
 
-tasks:
-  low-priority-grouping:
-    fixed-rate-ms: 6000 # 30 minutos en milisegundos (para @Scheduled)
+#tasks:
+#  low-priority-grouping:
+#    fixed-rate-ms: 6000 # 30 minutos en milisegundos (para @Scheduled)

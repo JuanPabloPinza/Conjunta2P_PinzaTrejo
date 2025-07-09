@@ -34,7 +34,7 @@ public class PendingNotificationService {
         }
     }
 
-    @Scheduled(fixedRate = 30000) // Reintenta cada 30 segundos
+    @Scheduled(fixedRateString = "${tasks.resilience-retry.rate}") // Reintenta cada 30 segundos
     @Transactional("resilienceTransactionManager")
     public void retryFailedNotifications() {
         var notificationsToRetry = pendingNotificationRepository.findByRetryCountLessThan(MAX_RETRIES);

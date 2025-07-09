@@ -21,7 +21,7 @@ public class LowPriorityBatchService {
     //real
     // @Scheduled(fixedRate = 30 * 60 * 1000) // Cada 30 minutos
     //pruebas
-    @Scheduled(fixedRate = 6000)
+    @Scheduled(fixedRateString = "${tasks.batch-sending.rate}")
     public void sendBatchedNotifications() {
         if (batchQueue.isEmpty()) {
             return;

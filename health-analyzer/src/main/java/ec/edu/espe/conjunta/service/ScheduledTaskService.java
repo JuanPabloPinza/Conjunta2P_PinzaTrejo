@@ -34,8 +34,9 @@ public class ScheduledTaskService {
 
     //real
     //@Scheduled(cron = "${tasks.daily-report.cron:0 0 4 * * *}") // Todos los días a las 4 AM por defecto
+
     //prueba
-    @Scheduled(cron = "0 */2 * * * *")
+    @Scheduled(cron = "${tasks.daily-report.cron}")
     @Transactional(value = "cockroachTransactionManager", readOnly = true) // Solo lectura
     public void generateDailyReport() {
         log.info("==================== INICIO TAREA: REPORTE DIARIO DE TENDENCIAS ====================");
@@ -117,7 +118,7 @@ public class ScheduledTaskService {
     //real
     //@Scheduled(cron = "${tasks.cleanup-old-data.cron:0 0 5 1 * *}") // El primer día de cada mes a las 5 AM
     //prueba
-    @Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "${tasks.cleanup-old-data.cron}")
     @Transactional("cockroachTransactionManager") // Esto sí modifica la BD
     public void cleanUpOldData() {
         log.info("Iniciando tarea mensual de limpieza de datos antiguos...");
@@ -141,7 +142,7 @@ public class ScheduledTaskService {
     //real
     //@Scheduled(fixedRateString = "${tasks.inactive-check.rate:21600000}") // Cada 6 horas por defecto
     //prueba
-    @Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(fixedRateString = "${tasks.inactive-check.rate}")
     @Transactional(value = "cockroachTransactionManager", readOnly = true)
     public void checkInactiveDevices() {
         log.info("Iniciando verificación de dispositivos inactivos...");
